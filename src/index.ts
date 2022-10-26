@@ -1,9 +1,11 @@
+import "dotenv/config";
 import { Command } from "commander";
 import { welcome } from "./helpers/compara";
 import Consumer from "./commands/Consumer";
 import Producer from "./commands/Producer";
 
 welcome();
+
 const program = new Command();
 
 program.version("0.1.0").description("Kafka CLI");

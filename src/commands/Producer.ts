@@ -1,30 +1,27 @@
-import KafkaProducer from "../helpers/KafkaProducer";
 import prompts from "prompts";
+import Kafka from "../helpers/Kafka";
 
 export default async function (topic: string) {
-  const producer = new KafkaProducer(topic);
-
-  send(producer, topic);
+  send(topic);
 }
 
-async function send(producer: KafkaProducer, topic: string) {
+async function send(topic: string) {
   try {
     await prompts({
       name: "messages",
       type: "text",
-      message: `Mensajes a enviar a ${topic}`,
+      message: `Mensajes a enviar a "${topic}"`,
       validate: async (value) => {
-        if (value.length == 0) return "Debe ingresar al menos un caracter";
+        if (value.length === 0) return "Debe ingresar al menos un caracter";
 
-        if (!(await producer.send(value))) {
-          return "Hubo un error al enviar el mensaje";
-        }
+        const kafka = new Kafka(topic);
+        await kafka.producer(value);
 
         return true;
       },
     });
 
-    send(producer, topic);
+    send(topic);
   } catch (error) {
     console.error(error);
   }
