@@ -2,28 +2,49 @@ import { setConfig, emit, ConsumerRouter, Callback } from "@comparaonline/event-
 
 export default class Kafka {
   private consumerStarted = false;
+  private host = process.env.KAFKA_HOST || "localhost:9092";
 
-  constructor(private topic: string) {
+  constructor() {
+    const hash = Date.now();
+
     setConfig({
       consumer: {
-        groupId: "kafka-test",
+        groupId: `kafka-test-${hash}`,
       },
-      host: process.env.KAFKA_HOSTNAME || "localhost:9092",
+      host: this.host,
     });
   }
 
-  async producer(data: any) {
-    await emit(this.topic, data);
+  async producer(topic: string, data: any) {
+    try {
+      let input = JSON.parse(data) as any;
+
+      if (input?.topic && input?.data) {
+        input = input.data;
+      }
+
+      const { code, ...payload } = input;
+      await emit(topic, code, payload);
+    } catch (error) {
+      console.log(JSON.parse(data));
+      console.error(error);
+    }
     return true;
   }
 
-  async consume(cb: Callback<any>) {
-    const consumer = new ConsumerRouter();
-    consumer.add(this.topic, cb as any);
+  async consume(topics: string[], cb: Callback<any>) {
+    console.log(`Starting at`, this.host);
 
     if (!this.consumerStarted) {
-      await consumer.start();
+      const consumer = new ConsumerRouter();
+      topics
+        .map((t) => t.trim())
+        .forEach((topic) => {
+          console.log(`Subscribing to ${topic}`);
+          consumer.add(topic, (data) => cb(topic, data));
+        });
       this.consumerStarted = true;
+      await consumer.start();
     }
   }
 }

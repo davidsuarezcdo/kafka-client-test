@@ -14,8 +14,8 @@ async function send(topic: string) {
       validate: async (value) => {
         if (value.length === 0) return "Debe ingresar al menos un caracter";
 
-        const kafka = new Kafka(topic);
-        await kafka.producer(value);
+        const kafka = new Kafka();
+        await kafka.producer(topic, value);
 
         return true;
       },

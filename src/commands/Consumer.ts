@@ -1,11 +1,9 @@
 import Kafka from "../helpers/Kafka";
 
-export default async function (topic: string) {
-  const kafka = new Kafka(topic);
+export default async function (topics: string[]) {
+  const kafka = new Kafka();
 
-  console.log(`listo para escuchar mensajes en "${topic}"\n`);
-  kafka.consume((data) => {
-    console.log(`from "${topic}":`);
-    console.table(data);
+  await kafka.consume(topics, (topic, data) => {
+    console.log(`From ${topic}:`, data);
   });
 }

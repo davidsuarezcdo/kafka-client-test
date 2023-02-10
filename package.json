@@ -6,8 +6,10 @@
   "scripts": {
     "build": "tsc",
     "postinstall": "npm run build",
-    "consume": "node build/index.js consumer",
-    "produce": "node build/index.js producer"
+    "dev": "npx ts-node src/index.ts",
+    "consumer": "node build/index.js consumer",
+    "producer": "node build/index.js producer",
+    "host": "node build/index.js host"
   },
   "author": "davidsuarezcdo",
   "license": "ISC",
