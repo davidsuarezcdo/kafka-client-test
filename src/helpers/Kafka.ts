@@ -2,7 +2,7 @@ import { setConfig, emit, ConsumerRouter, Callback } from "@comparaonline/event-
 
 export default class Kafka {
   private consumerStarted = false;
-  private host = process.env.KAFKA_HOST || "localhost:9092";
+  private host = process.env.KAFKA_HOST || "kafka-staging.internal.comparaonline.com:9092";
 
   constructor() {
     const hash = Date.now();
@@ -21,6 +21,10 @@ export default class Kafka {
 
       if (input?.topic && input?.data) {
         input = input.data;
+      }
+
+      if (!input?.code) {
+        input.code = topic;
       }
 
       const { code, ...payload } = input;
