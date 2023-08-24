@@ -2,7 +2,7 @@ import { setConfig, emit, ConsumerRouter, Callback } from "@comparaonline/event-
 
 export default class Kafka {
   private consumerStarted = false;
-  private host = process.env.KAFKA_HOST || "kafka-staging.internal.comparaonline.com:9092";
+  host = process.env.KAFKA_HOST as string;
 
   constructor() {
     const hash = Date.now();
@@ -37,8 +37,6 @@ export default class Kafka {
   }
 
   async consume(topics: string[], cb: Callback<any>) {
-    console.log(`Starting at`, this.host);
-
     if (!this.consumerStarted) {
       const consumer = new ConsumerRouter();
       topics
@@ -48,7 +46,9 @@ export default class Kafka {
           consumer.add(topic, (data) => cb(topic, data));
         });
       this.consumerStarted = true;
+      console.log(`Starting consumer at ${this.host}`);
       await consumer.start();
+      console.log("Consumer started");
     }
   }
 }

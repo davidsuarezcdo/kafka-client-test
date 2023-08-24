@@ -14,7 +14,6 @@
     "noUnusedParameters": true,
     "removeComments": false,
     "sourceMap": true,
-    "suppressImplicitAnyIndexErrors": true,
     "strictNullChecks": true,
     "target": "es2017",
     "skipLibCheck": true,
