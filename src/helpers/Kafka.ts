@@ -2,6 +2,7 @@ import { setConfig, emit, ConsumerRouter, Callback } from "@comparaonline/event-
 
 export default class Kafka {
   private consumerStarted = false;
+  profile = process.env.KAFKA_PROFILE as string;
   host = process.env.KAFKA_HOST as string;
 
   constructor() {
@@ -42,13 +43,14 @@ export default class Kafka {
       topics
         .map((t) => t.trim())
         .forEach((topic) => {
-          console.log(`Subscribing to ${topic}`);
+          console.log(`Suscribiendo a ${topic}`);
           consumer.add(topic, (data) => cb(topic, data));
         });
       this.consumerStarted = true;
-      console.log(`Starting consumer at ${this.host}`);
+      console.log(`Consumiendo en ${this.profile} [${this.host}]`);
+
       await consumer.start();
-      console.log("Consumer started");
+      console.log("Consumidor iniciado");
     }
   }
 }

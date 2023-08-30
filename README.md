@@ -1,25 +1,55 @@
 # Kafka cli
 
-Programa de prueba para el cliente de Kafka.
-
-Se realizo con el fin de entender la arquitectura y funcionamiento de Apache KAFKA para Comparaonline.cl
+Para realizar pruebas en kafka desde la consola, recibe los eventos o emite de ser necesario.
 
 ## Instalación
 
-## Instalar Kafka
+- Clona el repositorio
 
 ```shell
-docker-compose up -d
+git clone git@github.com:davidsuarezcdo/kafka-client-test.git
 ```
 
-## Instalar dependencias node
+- Haz un `yarn` para instalar las dependencias
 
 ```shell
 yarn
 ```
 
-## Uso
+- Añade index.js del build a tu archivo alias
 
 ```shell
-npx ts-node src/index.ts <consumer|producer> <topic>
+alias kafka="node ~/kafka-client-test/build/index.js"
+```
+
+## Uso
+
+### Suscribirse a un solo o multiples topicos
+
+```shell
+kafka consumer <topic> <topic> <topic>
+```
+
+### Emisión a topicos
+
+```shell
+kafka producer <topic>
+```
+
+### Configuración de perfil
+
+```shell
+kafka profile:create <name> <server:port>
+```
+
+### Listar perfiles
+
+```shell
+kafka profile:list
+```
+
+### Selección de perfil
+
+```shell
+kafka profile <name>
 ```

@@ -3,7 +3,7 @@ import Kafka from "../helpers/Kafka";
 
 export default async function (topic: string) {
   const kafka = new Kafka();
-  console.log(`Produciendo a "${kafka.host}"`);
+  console.log(`Produciendo en ${kafka.profile}(${kafka.host})`);
   send(kafka, topic);
 }
 

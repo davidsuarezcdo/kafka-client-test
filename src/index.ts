@@ -34,10 +34,21 @@ program
   .description("Cambia el host de Kafka")
   .action((profile: string) => {
     const projectPath = path.resolve(__dirname, `../.env.${profile.trim()}`);
+
+    if (!fs.existsSync(projectPath)) {
+      return console.log(
+        [
+          `\nProfile "${profile}" not found\n`,
+          "\tUse profile:list to see all profiles",
+          "\tUse profile:create to create a new profile",
+        ].join("\n")
+      );
+    }
+
     const data = fs.readFileSync(projectPath);
     fs.writeFileSync(path.resolve(__dirname, "../.env"), data);
     dotenv.config({ path: projectPath });
-    console.log(`Profile ${profile} loaded`);
+    console.log(`Se ha cargado el perfil de "${profile}"`);
   });
 
 program
@@ -45,8 +56,24 @@ program
   .description("Crea un nuevo perfil de configuracion")
   .action((profile: string, host: string) => {
     const projectPath = path.resolve(__dirname, `../.env.${profile.trim()}`);
-    fs.writeFileSync(projectPath, `KAFKA_HOST=${host.trim()}`);
-    console.log(`Profile ${profile} created with host ${host}`);
+
+    const data = [`KAFKA_PROFILE=${profile.trim()}`, `KAFKA_HOST=${host.trim()}`].join("\n");
+
+    fs.writeFileSync(projectPath, data);
+    console.log(`El perfil ${profile} ha sido creado con el ${host}`);
+  });
+
+program
+  .command("profile:list")
+  .description("Lista los perfiles de configuracion")
+  .action(() => {
+    const files = fs.readdirSync(path.resolve(__dirname, "../"));
+    const profiles = files
+      .filter((file) => file.startsWith(".env."))
+      .map((file) => file.replace(".env.", ""));
+
+    if (profiles.length === 0) console.log("No se encontraron perfiles");
+    else console.log("Perfiles:", profiles.join(", "));
   });
 
 program.parse(process.argv);
