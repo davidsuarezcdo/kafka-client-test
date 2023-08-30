@@ -18,7 +18,7 @@ export default class Kafka {
 
   async producer(topic: string, data: any) {
     try {
-      let input = JSON.parse(data) as any;
+      let input: any = typeof data === "string" ? JSON.parse(data) : data;
 
       if (input?.topic && input?.data) {
         input = input.data;

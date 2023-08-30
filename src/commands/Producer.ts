@@ -1,28 +1,37 @@
-import prompts from "prompts";
 import Kafka from "../helpers/Kafka";
+import { welcome } from "../helpers/compara";
+import { wait } from "../helpers/wait";
+import { objectToJsonColorized } from "../helpers/jsonColorize";
+import { readInputObject } from "../helpers/readInputObject";
 
 export default async function (topic: string) {
   const kafka = new Kafka();
-  console.log(`Produciendo en ${kafka.profile}(${kafka.host})`);
-  send(kafka, topic);
+  waitNewMessage(kafka, topic);
 }
 
-async function send(kafka: Kafka, topic: string) {
+async function waitNewMessage(kafka: Kafka, topic: string, oldMessage?: any): Promise<void> {
   try {
-    await prompts({
-      name: "messages",
-      type: "text",
-      message: `Mensajes a enviar a "${topic}"`,
-      validate: async (value) => {
-        if (value.length === 0) return "Debe ingresar al menos un caracter";
+    welcome(`Produciendo en "${topic}" de "${kafka.profile}" [${kafka.host}]`);
 
-        await kafka.producer(topic, value);
+    if (oldMessage) {
+      console.log("\nMensaje anterior:\n");
+      console.log(objectToJsonColorized(oldMessage));
+    }
 
-        return true;
-      },
-    });
+    console.log("\n----\n");
 
-    send(kafka, topic);
+    console.log("Ingrese el mensaje a enviar (JS/JSON):");
+    const message = await readInputObject();
+
+    if (!message) {
+      console.log("Mensaje invalido");
+      await wait(2500);
+      return waitNewMessage(kafka, topic, oldMessage);
+    }
+
+    console.log("Enviando mensaje", message);
+    await kafka.producer(topic, message);
+    waitNewMessage(kafka, topic, message);
   } catch (error) {
     console.error(error);
   }
