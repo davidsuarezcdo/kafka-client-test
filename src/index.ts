@@ -49,7 +49,14 @@ program
     fs.writeFileSync(path.resolve(__dirname, "../.env"), data);
     loadConfig(envPath);
 
-    const { KAFKA_HOST, KAFKA_PROFILE } = process.env;
+    const { KAFKA_HOST, KAFKA_PROFILE } = data
+      .toString()
+      .split("\n")
+      .reduce((acc, line) => {
+        const [key, value] = line.split("=");
+        (acc as any)[key] = value;
+        return acc;
+      }, {} as Record<string, string>);
 
     console.log(`Se ha cargado el perfil de "${KAFKA_PROFILE}" [${KAFKA_HOST}]`);
   });
