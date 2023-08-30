@@ -1,12 +1,12 @@
-import "dotenv/config";
-import * as dotenv from "dotenv";
 import { Command } from "commander";
 import { welcome } from "./helpers/compara";
 import Consumer from "./commands/Consumer";
 import Producer from "./commands/Producer";
 import fs from "fs";
 import path from "path";
+import loadConfig from "./helpers/loadConfig";
 
+loadConfig(path.resolve(__dirname, "../.env"));
 const program = new Command();
 
 program.version("0.1.0").description("Kafka CLI");
@@ -33,9 +33,9 @@ program
   .command("profile <profile>")
   .description("Cambia el host de Kafka")
   .action((profile: string) => {
-    const projectPath = path.resolve(__dirname, `../.env.${profile.trim()}`);
+    const envPath = path.resolve(__dirname, `../.env.${profile.trim()}`);
 
-    if (!fs.existsSync(projectPath)) {
+    if (!fs.existsSync(envPath)) {
       return console.log(
         [
           `\nProfile "${profile}" not found\n`,
@@ -45,10 +45,13 @@ program
       );
     }
 
-    const data = fs.readFileSync(projectPath);
+    const data = fs.readFileSync(envPath);
     fs.writeFileSync(path.resolve(__dirname, "../.env"), data);
-    dotenv.config({ path: projectPath });
-    console.log(`Se ha cargado el perfil de "${profile}"`);
+    loadConfig(envPath);
+
+    const { KAFKA_HOST, KAFKA_PROFILE } = process.env;
+
+    console.log(`Se ha cargado el perfil de "${KAFKA_PROFILE}" [${KAFKA_HOST}]`);
   });
 
 program
