@@ -9,7 +9,8 @@
     "dev": "npx ts-node src/index.ts",
     "consumer": "node build/index.js consumer",
     "producer": "node build/index.js producer",
-    "host": "node build/index.js host"
+    "host": "node build/index.js host",
+    "prepare": "yarn build"
   },
   "author": "davidsuarezcdo",
   "license": "ISC",

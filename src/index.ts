@@ -1,9 +1,11 @@
 import "dotenv/config";
+import * as dotenv from "dotenv";
 import { Command } from "commander";
 import { welcome } from "./helpers/compara";
 import Consumer from "./commands/Consumer";
 import Producer from "./commands/Producer";
 import fs from "fs";
+import path from "path";
 
 const program = new Command();
 
@@ -28,11 +30,23 @@ program
   });
 
 program
-  .command("host")
+  .command("profile <profile>")
   .description("Cambia el host de Kafka")
-  .alias("h")
-  .action((_arg, command) => {
-    fs.writeFileSync("/home/david/compara/projects/kafka-client-test/.env", `KAFKA_HOST="${command.args[0]}"`);
+  .action((profile: string) => {
+    const projectPath = path.resolve(__dirname, `../.env.${profile.trim()}`);
+    const data = fs.readFileSync(projectPath);
+    fs.writeFileSync(path.resolve(__dirname, "../.env"), data);
+    dotenv.config({ path: projectPath });
+    console.log(`Profile ${profile} loaded`);
+  });
+
+program
+  .command("profile:create <profile> <host>")
+  .description("Crea un nuevo perfil de configuracion")
+  .action((profile: string, host: string) => {
+    const projectPath = path.resolve(__dirname, `../.env.${profile.trim()}`);
+    fs.writeFileSync(projectPath, `KAFKA_HOST=${host.trim()}`);
+    console.log(`Profile ${profile} created with host ${host}`);
   });
 
 program.parse(process.argv);
