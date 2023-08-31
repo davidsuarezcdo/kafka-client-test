@@ -9,7 +9,7 @@ export const readInputObject = async () => {
   let jsonStr = "";
   let validJson = false;
   for await (const line of rl) {
-    jsonStr += line.trim();
+    jsonStr += line.trim().replace('^"', "").replace('"$', "");
 
     if (!jsonStr) continue;
     if (jsonStr === "exit") process.exit(0);
