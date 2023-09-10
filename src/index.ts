@@ -33,9 +33,9 @@ program
   .command("profile <profile>")
   .description("Cambia el host de Kafka")
   .action((profile: string) => {
-    const envPath = path.resolve(__dirname, `../.env.${profile.trim()}`);
+    const envLoadPath = path.resolve(__dirname, `../.env.${profile.trim()}`);
 
-    if (!fs.existsSync(envPath)) {
+    if (!fs.existsSync(envLoadPath)) {
       return console.log(
         [
           `\nProfile "${profile}" not found\n`,
@@ -45,9 +45,15 @@ program
       );
     }
 
-    const data = fs.readFileSync(envPath);
-    fs.writeFileSync(path.resolve(__dirname, "../.env"), data);
-    loadConfig(envPath);
+    const data = fs.readFileSync(envLoadPath);
+    const envMainPath = path.resolve(__dirname, "../.env");
+
+    fs.writeFileSync(envMainPath, data, {
+      encoding: "utf-8",
+      flag: "w",
+    });
+
+    loadConfig(envMainPath);
 
     const { KAFKA_HOST, KAFKA_PROFILE } = data
       .toString()
@@ -69,7 +75,10 @@ program
 
     const data = [`KAFKA_PROFILE=${profile.trim()}`, `KAFKA_HOST=${host.trim()}`].join("\n");
 
-    fs.writeFileSync(projectPath, data);
+    fs.writeFileSync(projectPath, data, {
+      encoding: "utf-8",
+      flag: "w",
+    });
     console.log(`El perfil ${profile} ha sido creado con el ${host}`);
   });
 
